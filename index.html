@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INVITE TO SAGA HQ // OMEGA_CHARLIE_SAGE_PREM</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+  :root {
+    --amber: #35AEB3;
+    --amber-bright: #5DE0E6;
+    --amber-dim: #1A5759;
+    --amber-glow: #35AEB355;
+    --bg: #020a0a;
+    --bg-panel: #041010;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: var(--bg);
+    color: var(--amber);
+    font-family: 'Share Tech Mono', monospace;
+    overflow-x: hidden;
+  }
+
+  /* CRT scanline overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.15) 2px,
+      rgba(0,0,0,0.15) 4px
+    );
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* CRT vignette */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.6) 100%);
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  /* Flicker animation */
+  @keyframes flicker {
+    0%, 100% { opacity: 1; }
+    92% { opacity: 1; }
+    93% { opacity: 0.8; }
+    94% { opacity: 1; }
+    96% { opacity: 0.9; }
+    97% { opacity: 1; }
+  }
+
+  .screen {
+    animation: flicker 6s infinite;
+    min-height: 100vh;
+    padding: 40px;
+    position: relative;
+  }
+
+  /* Top bar */
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--amber-dim);
+    padding: 8px 16px;
+    margin-bottom: 32px;
+    font-size: 13px;
+    color: var(--amber-dim);
+    letter-spacing: 2px;
+  }
+
+  .topbar .title {
+    color: var(--amber-bright);
+    font-size: 15px;
+    text-shadow: 0 0 8px var(--amber-glow);
+  }
+
+  /* Main terminal */
+  .terminal {
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  .header-box {
+    border: 2px solid var(--amber);
+    display: inline-block;
+    padding: 6px 20px;
+    margin-bottom: 28px;
+    font-size: 20px;
+    letter-spacing: 6px;
+    text-shadow: 0 0 12px var(--amber-glow);
+    color: var(--amber-bright);
+  }
+
+  .line {
+    font-size: 15px;
+    line-height: 1.9;
+    letter-spacing: 1.5px;
+    white-space: pre-wrap;
+    overflow: hidden;
+    opacity: 0;
+    color: var(--amber);
+  }
+
+  .line.visible {
+    opacity: 1;
+  }
+
+  .line .typed {
+    display: inline;
+  }
+
+  /* Cursor */
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .cursor {
+    display: inline-block;
+    width: 10px;
+    height: 17px;
+    background: var(--amber-bright);
+    vertical-align: text-bottom;
+    animation: blink 0.7s step-end infinite;
+    margin-left: 2px;
+    box-shadow: 0 0 6px var(--amber-glow);
+  }
+
+  .section-label {
+    color: var(--amber-bright);
+    text-shadow: 0 0 10px var(--amber-glow);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .key {
+    color: var(--amber-dim);
+  }
+
+  .val {
+    color: var(--amber-bright);
+    text-shadow: 0 0 4px var(--amber-glow);
+  }
+
+  .bracket {
+    color: var(--amber-dim);
+  }
+
+  .separator {
+    color: var(--amber-dim);
+  }
+
+  .highlight {
+    color: var(--amber-bright);
+    text-shadow: 0 0 10px var(--amber-glow), 0 0 20px var(--amber-glow);
+  }
+
+  .question {
+    color: #2CF5C8;
+    text-shadow: 0 0 6px #2CF5C844;
+  }
+
+  /* Globe */
+  .globe-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 auto 28px;
+    position: relative;
+  }
+
+  .globe-container canvas {
+    display: block;
+  }
+
+  .globe-label {
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--amber-dim);
+    margin-top: 8px;
+    text-align: center;
+  }
+
+  .globe-label .coords {
+    color: var(--amber-bright);
+    text-shadow: 0 0 6px var(--amber-glow);
+  }
+
+  /* Decorative bottom bar */
+  .bottombar {
+    margin-top: 48px;
+    border-top: 1px solid var(--amber-dim);
+    padding-top: 12px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--amber-dim);
+    letter-spacing: 3px;
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
+
+  .bottombar.visible {
+    opacity: 1;
+  }
+
+  .status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: var(--amber);
+    border-radius: 50%;
+    margin-right: 8px;
+    box-shadow: 0 0 6px var(--amber-glow);
+    animation: blink 2s step-end infinite;
+  }
+
+  /* Ambient background noise */
+  .noise {
+    position: fixed;
+    inset: 0;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 998;
+  }
+
+  /* Terrain wireframe decoration */
+  .terrain-deco {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 180px;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.08;
+  }
+
+  @media (max-width: 600px) {
+    .screen { padding: 20px 16px; }
+    .line { font-size: 12px; letter-spacing: 0.5px; }
+    .header-box { font-size: 14px; letter-spacing: 3px; }
+    .topbar { font-size: 10px; flex-direction: column; gap: 4px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="noise"></div>
+
+<svg class="terrain-deco" viewBox="0 0 1200 180" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+  <g stroke="#35AEB3" fill="none" stroke-width="0.8">
+    <polyline points="0,180 50,155 120,140 200,125 280,135 350,110 420,95 500,105 580,85 650,90 720,70 800,80 880,60 950,65 1020,50 1100,55 1200,40"/>
+    <polyline points="0,180 60,160 140,150 220,140 300,148 370,128 440,115 520,122 600,108 680,112 740,95 820,100 900,85 970,88 1040,75 1120,78 1200,65"/>
+    <polyline points="0,180 70,165 150,158 230,152 310,158 380,142 460,132 540,138 620,125 700,128 760,115 840,118 920,105 990,108 1060,98 1140,100 1200,88"/>
+    <polyline points="0,180 80,170 160,165 240,162 320,166 390,155 480,148 560,152 640,142 720,144 780,135 860,136 940,128 1010,130 1080,122 1160,122 1200,112"/>
+    <polyline points="0,180 90,175 170,172 250,170 330,173 400,166 500,162 580,164 660,158 740,160 800,154 880,155 960,150 1030,152 1100,148 1180,148 1200,138"/>
+  </g>
+</svg>
+
+<div class="screen">
+  <div class="topbar">
+    <span>SYS.DISPATCH.v4.2.1</span>
+    <span class="title">INVITE TO SAGA HQ</span>
+    <span>SEC: <span style="color:var(--amber-bright)">CLASSIFIED</span></span>
+  </div>
+
+  <div class="globe-container">
+    <canvas id="globe" width="360" height="360"></canvas>
+    <div class="globe-label">TARGET: <span class="coords">55.6761°N  12.5683°E</span> // COPENHAGEN</div>
+  </div>
+
+  <div class="terminal" id="terminal"></div>
+
+  <div class="bottombar" id="bottombar">
+    <span><span class="status-dot"></span>TRANSMISSION ACTIVE</span>
+    <span>NODE: CPH-38</span>
+    <span>FREQ: 482.7 MHz</span>
+  </div>
+</div>
+
+<script>
+// ── WIREFRAME GLOBE ──────────────────────────────────────────
+(function() {
+  const canvas = document.getElementById('globe');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const cx = W / 2, cy = H / 2, R = 140;
+
+  const AMBER = '#35AEB3';
+  const AMBER_BRIGHT = '#5DE0E6';
+  const AMBER_DIM = 'rgba(26,87,89,0.5)';
+  const AMBER_GLOW = 'rgba(53,174,179,0.35)';
+
+  // Copenhagen: 55.6761°N, 12.5683°E
+  const CPH_LAT = 55.6761 * Math.PI / 180;
+  const CPH_LON = 12.5683 * Math.PI / 180;
+
+  // Simplified continent outlines (lon, lat in degrees) - key coastlines only
+  const continents = [
+    // Europe outline
+    [[-10,35],[0,37],[3,43],[0,46],[-5,48],[2,51],[5,54],[9,54],[12,55],[13,55.7],[12,56],[10,58],[5,62],[7,65],[15,69],[25,71],[30,70],[28,65],[24,60],[25,57],[22,55],[14,54],[13,52],[17,54],[20,55],[24,55],[28,46],[26,42],[24,40],[26,38],[22,37],[20,38],[16,38],[13,38],[12,44],[7,44],[3,43],[0,43],[-2,43],[-5,44],[-9,43],[-10,35]],
+    // Africa outline
+    [[-18,15],[-17,21],[-13,28],[-5,36],[0,37],[10,37],[12,33],[25,32],[30,31],[33,30],[35,30],[42,12],[51,11],[44,2],[42,-5],[40,-11],[35,-26],[33,-34],[27,-34],[19,-35],[18,-32],[15,-27],[12,-18],[13,-12],[10,-1],[5,5],[2,6],[0,5],[-5,5],[-8,5],[-13,9],[-16,12],[-18,15]],
+    // Asia (simplified)
+    [[28,46],[30,40],[36,37],[35,33],[40,28],[45,25],[50,27],[55,25],[60,25],[65,26],[70,22],[75,15],[78,8],[80,12],[85,22],[88,22],[90,25],[95,16],[100,14],[102,2],[105,5],[108,16],[110,20],[117,25],[120,30],[122,35],[127,37],[130,35],[132,34],[131,40],[135,35],[140,40],[143,45],[145,50],[145,55],[140,55],[135,50],[130,48],[128,42],[120,40],[117,40],[110,45],[95,50],[85,55],[78,60],[70,65],[60,68],[50,70],[40,68],[30,70],[28,65],[24,60],[25,57],[28,46]],
+    // North America (simplified)
+    [[-170,65],[-168,60],[-165,62],[-155,58],[-148,60],[-140,60],[-138,58],[-135,55],[-130,50],[-125,49],[-124,42],[-120,35],[-117,33],[-112,30],[-105,25],[-100,20],[-97,18],[-92,18],[-87,21],[-83,23],[-82,25],[-81,28],[-82,30],[-85,30],[-88,30],[-90,29],[-94,30],[-97,28],[-97,33],[-95,35],[-90,35],[-82,35],[-76,37],[-74,40],[-70,42],[-67,45],[-66,44],[-65,47],[-60,47],[-58,50],[-55,52],[-60,55],[-65,60],[-72,62],[-80,63],[-85,65],[-95,68],[-105,68],[-120,70],[-140,70],[-155,72],[-165,68],[-170,65]],
+    // South America (simplified)
+    [[-80,10],[-77,8],[-72,12],[-67,11],[-60,8],[-55,5],[-51,0],[-50,-3],[-45,-5],[-40,-10],[-38,-15],[-39,-22],[-42,-23],[-48,-28],[-53,-33],[-58,-38],[-65,-40],[-68,-55],[-72,-52],[-75,-45],[-73,-40],[-72,-35],[-70,-30],[-70,-20],[-75,-15],[-77,-10],[-80,-3],[-80,3],[-77,5],[-80,10]],
+    // Australia (simplified)
+    [[115,-34],[117,-35],[120,-34],[128,-32],[131,-31],[133,-33],[136,-35],[139,-37],[142,-38],[147,-38],[150,-37],[152,-33],[153,-28],[150,-23],[145,-15],[142,-11],[136,-12],[130,-14],[126,-13],[122,-17],[114,-22],[113,-25],[114,-30],[115,-34]]
+  ];
+
+  let rotation = -0.4; // Start with Europe roughly facing us
+
+  function project(lat, lon, rot) {
+    const x3 = Math.cos(lat) * Math.sin(lon + rot);
+    const y3 = -Math.sin(lat);
+    const z3 = Math.cos(lat) * Math.cos(lon + rot);
+    return { x: cx + x3 * R, y: cy + y3 * R, z: z3 };
+  }
+
+  function drawGlobe() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Outer circle glow
+    ctx.beginPath();
+    ctx.arc(cx, cy, R + 4, 0, Math.PI * 2);
+    ctx.strokeStyle = AMBER_DIM;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, R, 0, Math.PI * 2);
+    ctx.strokeStyle = AMBER;
+    ctx.lineWidth = 1.5;
+    ctx.shadowColor = AMBER_GLOW;
+    ctx.shadowBlur = 10;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // Latitude lines
+    for (let lat = -75; lat <= 75; lat += 15) {
+      const latR = lat * Math.PI / 180;
+      ctx.beginPath();
+      let started = false;
+      for (let lon = 0; lon <= 360; lon += 3) {
+        const lonR = lon * Math.PI / 180;
+        const p = project(latR, lonR, rotation);
+        if (p.z < 0) { started = false; continue; }
+        if (!started) { ctx.moveTo(p.x, p.y); started = true; }
+        else ctx.lineTo(p.x, p.y);
+      }
+      ctx.strokeStyle = lat === 0 ? AMBER_DIM : 'rgba(26,87,89,0.25)';
+      ctx.lineWidth = lat === 0 ? 0.8 : 0.4;
+      ctx.stroke();
+    }
+
+    // Longitude lines
+    for (let lon = 0; lon < 360; lon += 20) {
+      const lonR = lon * Math.PI / 180;
+      ctx.beginPath();
+      let started = false;
+      for (let lat = -90; lat <= 90; lat += 3) {
+        const latR = lat * Math.PI / 180;
+        const p = project(latR, lonR, rotation);
+        if (p.z < 0) { started = false; continue; }
+        if (!started) { ctx.moveTo(p.x, p.y); started = true; }
+        else ctx.lineTo(p.x, p.y);
+      }
+      ctx.strokeStyle = 'rgba(26,87,89,0.25)';
+      ctx.lineWidth = 0.4;
+      ctx.stroke();
+    }
+
+    // Continents
+    for (const coast of continents) {
+      ctx.beginPath();
+      let started = false;
+      for (const [lon, lat] of coast) {
+        const latR = lat * Math.PI / 180;
+        const lonR = lon * Math.PI / 180;
+        const p = project(latR, lonR, rotation);
+        if (p.z < 0) { started = false; continue; }
+        if (!started) { ctx.moveTo(p.x, p.y); started = true; }
+        else ctx.lineTo(p.x, p.y);
+      }
+      ctx.strokeStyle = AMBER;
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+    }
+
+    // Copenhagen pin
+    const cph = project(CPH_LAT, CPH_LON, rotation);
+    if (cph.z > 0) {
+      // Pin line
+      ctx.beginPath();
+      ctx.moveTo(cph.x, cph.y);
+      ctx.lineTo(cph.x, cph.y - 28);
+      ctx.strokeStyle = AMBER_BRIGHT;
+      ctx.lineWidth = 1.5;
+      ctx.shadowColor = AMBER_GLOW;
+      ctx.shadowBlur = 8;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      // Pin dot
+      ctx.beginPath();
+      ctx.arc(cph.x, cph.y, 4, 0, Math.PI * 2);
+      ctx.fillStyle = AMBER_BRIGHT;
+      ctx.shadowColor = AMBER_GLOW;
+      ctx.shadowBlur = 14;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Pulsing ring
+      const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 300);
+      ctx.beginPath();
+      ctx.arc(cph.x, cph.y, 8 + pulse * 6, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(93,224,230,${0.4 - pulse * 0.3})`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Label
+      ctx.font = '11px Share Tech Mono, monospace';
+      ctx.fillStyle = AMBER_BRIGHT;
+      ctx.shadowColor = AMBER_GLOW;
+      ctx.shadowBlur = 6;
+      ctx.fillText('CPH', cph.x + 8, cph.y - 30);
+      ctx.shadowBlur = 0;
+
+      // Crosshair
+      const ch = 10;
+      ctx.beginPath();
+      ctx.moveTo(cph.x - ch, cph.y); ctx.lineTo(cph.x - 6, cph.y);
+      ctx.moveTo(cph.x + 6, cph.y); ctx.lineTo(cph.x + ch, cph.y);
+      ctx.moveTo(cph.x, cph.y - ch); ctx.lineTo(cph.x, cph.y - 6);
+      ctx.moveTo(cph.x, cph.y + 6); ctx.lineTo(cph.x, cph.y + ch);
+      ctx.strokeStyle = 'rgba(93,224,230,0.5)';
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+    }
+
+    // Corner brackets decoration
+    const b = 12;
+    ctx.strokeStyle = AMBER_DIM;
+    ctx.lineWidth = 1;
+    // top-left
+    ctx.beginPath(); ctx.moveTo(4, b+4); ctx.lineTo(4, 4); ctx.lineTo(b+4, 4); ctx.stroke();
+    // top-right
+    ctx.beginPath(); ctx.moveTo(W-b-4, 4); ctx.lineTo(W-4, 4); ctx.lineTo(W-4, b+4); ctx.stroke();
+    // bottom-left
+    ctx.beginPath(); ctx.moveTo(4, H-b-4); ctx.lineTo(4, H-4); ctx.lineTo(b+4, H-4); ctx.stroke();
+    // bottom-right
+    ctx.beginPath(); ctx.moveTo(W-b-4, H-4); ctx.lineTo(W-4, H-4); ctx.lineTo(W-4, H-b-4); ctx.stroke();
+
+    rotation += 0.003;
+    requestAnimationFrame(drawGlobe);
+  }
+
+  drawGlobe();
+})();
+// ── END GLOBE ────────────────────────────────────────────────
+
+const lines = [
+  { text: '┌──────────────────────────────────────────┐', cls: 'separator' },
+  { text: '│  INVITE TO SAGA HQ                      │', cls: 'highlight' },
+  { text: '└──────────────────────────────────────────┘', cls: 'separator' },
+  { text: '' },
+  { text: 'OPERATION: OMEGA_CHARLIE_SAGE_PREM', markup: [
+    { text: 'OPERATION: ', cls: 'key' },
+    { text: 'OMEGA_CHARLIE_SAGE_PREM', cls: 'highlight' }
+  ]},
+  { text: 'DATE: FRIDAY/24/04/2026', markup: [
+    { text: 'DATE: ', cls: 'key' },
+    { text: 'FRIDAY/24/04/2026', cls: 'val' }
+  ]},
+  { text: 'LOCATION: 2450 COPENHAGEN, BÅDEHAVNSGADE 38, PORT 1', markup: [
+    { text: 'LOCATION: ', cls: 'key' },
+    { text: '2450 COPENHAGEN, BÅDEHAVNSGADE 38, PORT 1', cls: 'val' }
+  ]},
+  { text: 'START_TIME: 09:00', markup: [
+    { text: 'START_TIME: ', cls: 'key' },
+    { text: '09:00', cls: 'val' }
+  ]},
+  { text: 'END_TIME: TBD', markup: [
+    { text: 'END_TIME: ', cls: 'key' },
+    { text: 'TBD', cls: 'question' }
+  ]},
+  { text: '─────────────────────────────────', cls: 'separator' },
+  { text: '' },
+  { text: 'AGENDA:', cls: 'section-label' },
+  { text: '  [TOUR, WEEKLY, WORKSHOP??]', markup: [
+    { text: '  [', cls: 'bracket' },
+    { text: 'TOUR, WEEKLY, WORKSHOP', cls: 'val' },
+    { text: '??', cls: 'question' },
+    { text: ']', cls: 'bracket' }
+  ]},
+  { text: '' },
+  { text: 'WORKSHOP_AGENDA_OPTIONS:', cls: 'section-label' },
+  { text: '  [VISUAL_STYLE,', markup: [
+    { text: '  [', cls: 'bracket' },
+    { text: 'VISUAL_STYLE,', cls: 'val' }
+  ]},
+  { text: '   KVALIFIK_LOGO_STATUS,', markup: [
+    { text: '   ', cls: '' },
+    { text: 'KVALIFIK_LOGO_STATUS,', cls: 'val' }
+  ]},
+  { text: '   ROADMAP,', markup: [
+    { text: '   ', cls: '' },
+    { text: 'ROADMAP,', cls: 'val' }
+  ]},
+  { text: '   CORRELATION_ENGINE,', markup: [
+    { text: '   ', cls: '' },
+    { text: 'CORRELATION_ENGINE,', cls: 'val' }
+  ]},
+  { text: '   ANCHOR_CUSTOMERS,', markup: [
+    { text: '   ', cls: '' },
+    { text: 'ANCHOR_CUSTOMERS,', cls: 'val' }
+  ]},
+  { text: '   VIDEOS]', markup: [
+    { text: '   ', cls: '' },
+    { text: 'VIDEOS', cls: 'val' },
+    { text: ']', cls: 'bracket' }
+  ]},
+  { text: '' },
+  { text: 'WORKSHOP_ON_PREMISE: Y/N', markup: [
+    { text: 'WORKSHOP_ON_PREMISE: ', cls: 'key' },
+    { text: 'Y/N', cls: 'question' }
+  ]},
+  { text: 'WORKSHOP_WITH_MIRKO: Y/N', markup: [
+    { text: 'WORKSHOP_WITH_MIRKO: ', cls: 'key' },
+    { text: 'Y/N', cls: 'question' }
+  ]},
+  { text: 'INVITE_GUEST_TRUESEC_TOBIAS_OXNAN: Y/N', markup: [
+    { text: 'INVITE_GUEST_TRUESEC_TOBIAS_OXNAN: ', cls: 'key' },
+    { text: 'Y/N', cls: 'question' }
+  ]},
+  { text: '─────────────────────────────────', cls: 'separator' },
+  { text: '' },
+  { text: 'PARTICIPANTS_ON_SITE:', cls: 'section-label' },
+  { text: '  [CHARLIE, EMIL?, MARIUS, OSCAR, NICOLAI]', markup: [
+    { text: '  [', cls: 'bracket' },
+    { text: 'CHARLIE, ', cls: 'val' },
+    { text: 'EMIL?, ', cls: 'question' },
+    { text: 'MARIUS, OSCAR, NICOLAI', cls: 'val' },
+    { text: ']', cls: 'bracket' }
+  ]},
+  { text: 'PARTICIPANTS_ONLINE:', cls: 'section-label' },
+  { text: '  [FRENCESCA?, MIRKO?, MAKSYM?]', markup: [
+    { text: '  [', cls: 'bracket' },
+    { text: 'FRENCESCA?, ', cls: 'question' },
+    { text: 'MIRKO?, ', cls: 'question' },
+    { text: 'MAKSYM?', cls: 'question' },
+    { text: ']', cls: 'bracket' }
+  ]},
+  { text: 'PARTICIPANT_GUEST:', cls: 'section-label' },
+  { text: '  [TBD]', markup: [
+    { text: '  [', cls: 'bracket' },
+    { text: 'TBD', cls: 'question' },
+    { text: ']', cls: 'bracket' }
+  ]},
+  { text: '─────────────────────────────────', cls: 'separator' },
+  { text: '' },
+  { text: 'DRINKS:', cls: 'section-label' },
+  { text: '  [COFFEE, COLA_CANS, WATER]', markup: [
+    { text: '  [', cls: 'bracket' },
+    { text: 'COFFEE, COLA_CANS, WATER', cls: 'val' },
+    { text: ']', cls: 'bracket' }
+  ]},
+  { text: 'NURISHMENT:', cls: 'section-label' },
+  { text: '  [CROSSANT, TE_BIRKES]', markup: [
+    { text: '  [', cls: 'bracket' },
+    { text: 'CROSSANT, TE_BIRKES', cls: 'val' },
+    { text: ']', cls: 'bracket' }
+  ]},
+  { text: '' },
+  { text: '┌──────────────────────────────────────────┐', cls: 'separator' },
+  { text: '│  END TRANSMISSION                        │', cls: 'separator' },
+  { text: '└──────────────────────────────────────────┘', cls: 'separator' },
+];
+
+const terminal = document.getElementById('terminal');
+const bottombar = document.getElementById('bottombar');
+
+let currentLine = 0;
+let currentChar = 0;
+let currentSpan = null;
+let cursorEl = null;
+
+function createCursor() {
+  if (cursorEl) cursorEl.remove();
+  cursorEl = document.createElement('span');
+  cursorEl.className = 'cursor';
+  return cursorEl;
+}
+
+function getPlainText(line) {
+  if (line.markup) {
+    return line.markup.map(m => m.text).join('');
+  }
+  return line.text;
+}
+
+function typeNextChar() {
+  if (currentLine >= lines.length) {
+    if (cursorEl) cursorEl.remove();
+    bottombar.classList.add('visible');
+    return;
+  }
+
+  const line = lines[currentLine];
+  const plainText = getPlainText(line);
+
+  // Create line element if at start
+  if (currentChar === 0) {
+    const lineEl = document.createElement('div');
+    lineEl.className = 'line visible';
+    lineEl.dataset.lineIndex = currentLine;
+    terminal.appendChild(lineEl);
+    currentSpan = lineEl;
+
+    if (plainText === '') {
+      lineEl.innerHTML = '&nbsp;';
+      currentLine++;
+      currentChar = 0;
+      setTimeout(typeNextChar, 40);
+      return;
+    }
+  }
+
+  const lineEl = terminal.querySelector(`[data-line-index="${currentLine}"]`);
+
+  if (currentChar < plainText.length) {
+    // Rebuild the line content up to currentChar+1
+    const visibleText = plainText.substring(0, currentChar + 1);
+    let html = '';
+
+    if (line.markup) {
+      let charCount = 0;
+      for (const segment of line.markup) {
+        const segStart = charCount;
+        const segEnd = charCount + segment.text.length;
+        if (segStart < visibleText.length) {
+          const visiblePart = segment.text.substring(0, Math.min(segment.text.length, visibleText.length - segStart));
+          html += `<span class="${segment.cls}">${escapeHtml(visiblePart)}</span>`;
+        }
+        charCount = segEnd;
+      }
+    } else if (line.cls) {
+      html = `<span class="${line.cls}">${escapeHtml(visibleText)}</span>`;
+    } else {
+      html = escapeHtml(visibleText);
+    }
+
+    lineEl.innerHTML = html;
+    lineEl.appendChild(createCursor());
+
+    currentChar++;
+    const delay = plainText[currentChar - 1] === ' ' ? 15 : (Math.random() * 25 + 12);
+    setTimeout(typeNextChar, delay);
+  } else {
+    // Line complete
+    if (cursorEl) cursorEl.remove();
+    currentLine++;
+    currentChar = 0;
+    setTimeout(typeNextChar, 80);
+  }
+}
+
+function escapeHtml(text) {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// Start after small delay
+setTimeout(typeNextChar, 800);
+
+// Add ambient audio-like hum via subtle CSS animation
+document.body.style.setProperty('--hue-shift', '0deg');
+let hue = 0;
+setInterval(() => {
+  hue = (hue + 0.2) % 5;
+  document.body.style.filter = `hue-rotate(${hue - 2.5}deg)`;
+}, 200);
+</script>
+</body>
+</html>
