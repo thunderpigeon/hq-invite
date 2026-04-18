@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>INVITE TO SAGA HQ // OMEGA_CHARLIE_SAGE_PREM</title>
+<title>INVITE TO SAGA HQ // OMEGA_CHARLIE_SAGA_HQ</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
@@ -62,12 +62,31 @@
     97% { opacity: 1; }
   }
 
+  /* CRT power-on boot: thin bright line expands to full, flickers, settles */
+  @keyframes crt-boot {
+    0%   { transform: scaleY(0.002); filter: brightness(3) blur(1px); opacity: 0; }
+    6%   { transform: scaleY(0.002); filter: brightness(3) blur(1px); opacity: 1; }
+    28%  { transform: scaleY(1);     filter: brightness(2.2) blur(0.6px); opacity: 1; }
+    40%  { filter: brightness(0.35); }
+    52%  { filter: brightness(1.5); }
+    64%  { filter: brightness(0.7); }
+    78%  { filter: brightness(1.15); }
+    100% { transform: scaleY(1);     filter: brightness(1); opacity: 1; }
+  }
+
   .screen {
-    animation: flicker 6s infinite;
+    transform-origin: center;
+    animation:
+      crt-boot 720ms 300ms cubic-bezier(0.23, 1, 0.32, 1) both,
+      flicker 6s 1020ms infinite;
     min-height: 100vh;
     padding: 40px;
     position: relative;
     z-index: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .screen { animation: none; }
   }
 
   /* Top bar */
@@ -519,9 +538,9 @@ const lines = [
   { text: '│  INVITE TO SAGA HQ                      │', cls: 'highlight' },
   { text: '└──────────────────────────────────────────┘', cls: 'separator' },
   { text: '' },
-  { text: 'OPERATION: OMEGA_CHARLIE_SAGE_PREM', markup: [
+  { text: 'OPERATION: OMEGA_CHARLIE_SAGA_HQ', markup: [
     { text: 'OPERATION: ', cls: 'key' },
-    { text: 'OMEGA_CHARLIE_SAGE_PREM', cls: 'highlight' }
+    { text: 'OMEGA_CHARLIE_SAGA_HQ', cls: 'highlight' }
   ]},
   { text: 'DATE: FRIDAY/24/04/2026', markup: [
     { text: 'DATE: ', cls: 'key' },
@@ -617,12 +636,12 @@ const lines = [
     { text: '  TARGET: ', cls: 'key' },
     { text: 'BÅDEHAVNSGADE 38, PORT 1', cls: 'val' }
   ]},
-  { text: '  DISTANCE: 1.2 KM // ETA: 12 MIN ON_FOOT', markup: [
+  { text: '  DISTANCE: 1.2 KM // ETA: 10 MIN ON_FOOT', markup: [
     { text: '  DISTANCE: ', cls: 'key' },
     { text: '1.2 KM', cls: 'val' },
     { text: ' // ', cls: 'separator' },
     { text: 'ETA: ', cls: 'key' },
-    { text: '12 MIN ON_FOOT', cls: 'val' }
+    { text: '10 MIN ON_FOOT', cls: 'val' }
   ]},
   { type: 'html', html: `
     <div class="route-map">
@@ -856,128 +875,51 @@ const lines = [
 const terminal = document.getElementById('terminal');
 const bottombar = document.getElementById('bottombar');
 
-let currentLine = 0;
-let currentChar = 0;
-let currentSpan = null;
-let cursorEl = null;
-
-function createCursor() {
-  if (cursorEl) cursorEl.remove();
-  cursorEl = document.createElement('span');
-  cursorEl.className = 'cursor';
-  return cursorEl;
-}
-
-function getPlainText(line) {
-  if (line.markup) {
-    return line.markup.map(m => m.text).join('');
-  }
-  return line.text;
-}
-
-function typeNextChar() {
-  if (currentLine >= lines.length) {
-    if (cursorEl) cursorEl.remove();
-    bottombar.classList.add('visible');
-    return;
-  }
-
-  const line = lines[currentLine];
-
-  // Raw HTML injection (e.g. map, embedded graphics) — render once, no typing
-  if (line.type === 'html') {
-    const container = document.createElement('div');
-    container.innerHTML = line.html;
-    terminal.appendChild(container);
-    currentLine++;
-    currentChar = 0;
-    setTimeout(typeNextChar, 420);
-    return;
-  }
-
-  const plainText = getPlainText(line);
-
-  // Create line element if at start
-  if (currentChar === 0) {
-    const lineEl = document.createElement('div');
-    lineEl.className = 'line visible';
-    lineEl.dataset.lineIndex = currentLine;
-    terminal.appendChild(lineEl);
-    currentSpan = lineEl;
-
-    if (plainText === '') {
-      lineEl.innerHTML = '&nbsp;';
-      currentLine++;
-      currentChar = 0;
-      setTimeout(typeNextChar, 160); // breathe on blank lines
-      return;
-    }
-  }
-
-  const lineEl = terminal.querySelector(`[data-line-index="${currentLine}"]`);
-
-  if (currentChar < plainText.length) {
-    // Rebuild the line content up to currentChar+1
-    const visibleText = plainText.substring(0, currentChar + 1);
-    let html = '';
-
-    if (line.markup) {
-      let charCount = 0;
-      for (const segment of line.markup) {
-        const segStart = charCount;
-        const segEnd = charCount + segment.text.length;
-        if (segStart < visibleText.length) {
-          const visiblePart = segment.text.substring(0, Math.min(segment.text.length, visibleText.length - segStart));
-          html += `<span class="${segment.cls}">${escapeHtml(visiblePart)}</span>`;
-        }
-        charCount = segEnd;
-      }
-    } else if (line.cls) {
-      html = `<span class="${line.cls}">${escapeHtml(visibleText)}</span>`;
-    } else {
-      html = escapeHtml(visibleText);
-    }
-
-    lineEl.innerHTML = html;
-    lineEl.appendChild(createCursor());
-
-    currentChar++;
-    const justTyped = plainText[currentChar - 1];
-
-    // Base char cadence — unchanged authentic CRT feel
-    let delay;
-    if (justTyped === ' ') delay = 18;
-    else delay = Math.random() * 25 + 12;
-
-    // Punctuation micro-holds — operator weighing what comes next
-    if (justTyped === ',') delay += 140;
-    else if (justTyped === ':') delay += 180;
-    else if (justTyped === ']') delay += 220;
-    else if (justTyped === '?') delay += 160;
-    else if (justTyped === '.') delay += 120;
-
-    setTimeout(typeNextChar, delay);
-  } else {
-    // Line complete — inter-line beat varies by line type
-    if (cursorEl) cursorEl.remove();
-
-    let interLineDelay = 180;
-    if (line.cls === 'section-label') interLineDelay = 400;   // dramatic beat after header
-    else if (line.cls === 'separator') interLineDelay = 280;  // settle after divider
-    else if (line.cls === 'highlight') interLineDelay = 340;  // let callout land
-
-    currentLine++;
-    currentChar = 0;
-    setTimeout(typeNextChar, interLineDelay);
-  }
-}
-
 function escapeHtml(text) {
   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-// Start after small delay
-setTimeout(typeNextChar, 800);
+function renderLine(line) {
+  if (line.type === 'html') {
+    const container = document.createElement('div');
+    container.innerHTML = line.html;
+    terminal.appendChild(container);
+    return;
+  }
+
+  const lineEl = document.createElement('div');
+  lineEl.className = 'line visible';
+
+  const plainText = line.markup ? line.markup.map(m => m.text).join('') : line.text;
+
+  if (plainText === '') {
+    lineEl.innerHTML = '&nbsp;';
+  } else if (line.markup) {
+    lineEl.innerHTML = line.markup
+      .map(seg => `<span class="${seg.cls}">${escapeHtml(seg.text)}</span>`)
+      .join('');
+  } else if (line.cls) {
+    lineEl.innerHTML = `<span class="${line.cls}">${escapeHtml(plainText)}</span>`;
+  } else {
+    lineEl.textContent = plainText;
+  }
+
+  terminal.appendChild(lineEl);
+}
+
+// Render all lines instantly — the CRT boot animation handles the reveal
+lines.forEach(renderLine);
+
+// Blinking cursor at the end of the last text line
+const lastLine = terminal.querySelector('.line:last-of-type');
+if (lastLine) {
+  const cursor = document.createElement('span');
+  cursor.className = 'cursor';
+  lastLine.appendChild(cursor);
+}
+
+// Reveal bottom status bar once the boot animation has settled
+setTimeout(() => bottombar.classList.add('visible'), 1020);
 
 // Add ambient audio-like hum via subtle CSS animation
 document.body.style.setProperty('--hue-shift', '0deg');
