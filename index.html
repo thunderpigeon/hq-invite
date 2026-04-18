@@ -252,6 +252,41 @@
     opacity: 0.08;
   }
 
+  /* Route map */
+  .route-map {
+    margin: 18px 0 22px;
+    border: 1px solid var(--amber-dim);
+    background: var(--bg-panel);
+    padding: 10px 12px 12px;
+    position: relative;
+  }
+
+  .route-map .map-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--amber-dim);
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--amber-dim);
+  }
+
+  .route-map svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .map-route-trail {
+    filter: drop-shadow(0 0 4px var(--amber-glow));
+    animation: map-dash 2.5s linear infinite;
+  }
+
+  @keyframes map-dash {
+    to { stroke-dashoffset: -22; }
+  }
+
   @media (max-width: 600px) {
     .screen { padding: 20px 16px; }
     .line { font-size: 12px; letter-spacing: 0.5px; }
@@ -571,6 +606,247 @@ const lines = [
     { text: 'CROSSANT, TE_BIRKES', cls: 'val' },
     { text: ']', cls: 'bracket' }
   ]},
+  { text: '─────────────────────────────────', cls: 'separator' },
+  { text: '' },
+  { text: 'APPROACH_VECTOR:', cls: 'section-label' },
+  { text: '  ORIGIN: SLUSEHOLMEN ST. (METRO)', markup: [
+    { text: '  ORIGIN: ', cls: 'key' },
+    { text: 'SLUSEHOLMEN ST. (METRO)', cls: 'val' }
+  ]},
+  { text: '  TARGET: BÅDEHAVNSGADE 38, PORT 1', markup: [
+    { text: '  TARGET: ', cls: 'key' },
+    { text: 'BÅDEHAVNSGADE 38, PORT 1', cls: 'val' }
+  ]},
+  { text: '  DISTANCE: 1.2 KM // ETA: 12 MIN ON_FOOT', markup: [
+    { text: '  DISTANCE: ', cls: 'key' },
+    { text: '1.2 KM', cls: 'val' },
+    { text: ' // ', cls: 'separator' },
+    { text: 'ETA: ', cls: 'key' },
+    { text: '12 MIN ON_FOOT', cls: 'val' }
+  ]},
+  { type: 'html', html: `
+    <div class="route-map">
+      <div class="map-header">
+        <span>NAV.CHART // SECTOR_CPH_SYDHAVN</span>
+        <span>SCALE 1:8000</span>
+      </div>
+      <svg viewBox="0 0 820 500" xmlns="http://www.w3.org/2000/svg">
+        <!-- Corner brackets -->
+        <g stroke="#1A5759" fill="none" stroke-width="1">
+          <polyline points="6,18 6,6 18,6"/>
+          <polyline points="802,6 814,6 814,18"/>
+          <polyline points="6,482 6,494 18,494"/>
+          <polyline points="802,494 814,494 814,482"/>
+        </g>
+        <!-- Grid -->
+        <g stroke="#1A5759" stroke-opacity="0.2" stroke-width="0.4">
+          <line x1="0" y1="60" x2="820" y2="60"/>
+          <line x1="0" y1="120" x2="820" y2="120"/>
+          <line x1="0" y1="180" x2="820" y2="180"/>
+          <line x1="0" y1="240" x2="820" y2="240"/>
+          <line x1="0" y1="300" x2="820" y2="300"/>
+          <line x1="0" y1="360" x2="820" y2="360"/>
+          <line x1="0" y1="420" x2="820" y2="420"/>
+          <line x1="0" y1="480" x2="820" y2="480"/>
+          <line x1="100" y1="0" x2="100" y2="500"/>
+          <line x1="200" y1="0" x2="200" y2="500"/>
+          <line x1="300" y1="0" x2="300" y2="500"/>
+          <line x1="400" y1="0" x2="400" y2="500"/>
+          <line x1="500" y1="0" x2="500" y2="500"/>
+          <line x1="600" y1="0" x2="600" y2="500"/>
+          <line x1="700" y1="0" x2="700" y2="500"/>
+        </g>
+
+        <!-- WATER: Fiskerhavnen harbor basin (bottom-right) -->
+        <path d="M 430,360 L 500,352 L 600,350 Q 680,352 730,370 L 780,400 L 800,440 L 800,500 L 430,500 L 430,420 Q 436,390 430,360 Z"
+              fill="#041818" stroke="#35AEB3" stroke-width="1" stroke-opacity="0.55"/>
+
+        <!-- WATER: east harbor strip (Sydhavn) -->
+        <path d="M 780,0 L 820,0 L 820,500 L 808,460 L 790,380 L 784,280 L 782,180 L 780,80 Z"
+              fill="#041818" stroke="#35AEB3" stroke-width="1" stroke-opacity="0.5"/>
+
+        <!-- WATER: Sluseholmen canal pockets (top-right island grid) -->
+        <g fill="#041818" stroke="#35AEB3" stroke-width="0.6" stroke-opacity="0.45">
+          <rect x="640" y="40" width="40" height="18"/>
+          <rect x="700" y="40" width="40" height="18"/>
+          <rect x="640" y="90" width="40" height="18"/>
+          <rect x="700" y="90" width="40" height="18"/>
+          <rect x="640" y="140" width="40" height="18"/>
+          <rect x="700" y="140" width="40" height="18"/>
+          <rect x="640" y="190" width="40" height="18"/>
+          <rect x="700" y="190" width="40" height="18"/>
+        </g>
+
+        <!-- WATER: small canal cut west of destination peninsula -->
+        <path d="M 296,408 L 420,404 L 420,420 L 296,424 Z"
+              fill="#041818" stroke="#35AEB3" stroke-width="0.6" stroke-opacity="0.4"/>
+
+        <!-- Harbor wave lines -->
+        <g stroke="#35AEB3" stroke-opacity="0.18" stroke-width="0.5" fill="none">
+          <path d="M 500,410 Q 540,405 580,410 T 660,415"/>
+          <path d="M 510,440 Q 550,435 590,440 T 670,445"/>
+          <path d="M 520,470 Q 560,465 600,470 T 680,475"/>
+        </g>
+
+        <!-- Docks inside Fiskerhavnen -->
+        <g stroke="#35AEB3" stroke-opacity="0.55" fill="none" stroke-width="0.7">
+          <line x1="560" y1="480" x2="560" y2="500"/>
+          <line x1="590" y1="480" x2="590" y2="500"/>
+          <line x1="620" y1="480" x2="620" y2="500"/>
+          <line x1="650" y1="482" x2="650" y2="498"/>
+        </g>
+
+        <!-- GREEN: Havebyen Mozart garden plots (west) -->
+        <g fill="#0a1f14" stroke="#1A5759" stroke-opacity="0.4" stroke-width="0.5">
+          <rect x="20" y="220" width="60" height="50"/>
+          <rect x="90" y="220" width="60" height="50"/>
+          <rect x="20" y="280" width="60" height="60"/>
+          <rect x="90" y="280" width="60" height="60"/>
+          <rect x="160" y="260" width="70" height="70"/>
+        </g>
+
+        <!-- GREEN: park strip south of Sjællandsbroen -->
+        <path d="M 0,340 L 430,340 L 430,400 Q 360,406 280,408 L 0,410 Z"
+              fill="#0a1f14" stroke="#1A5759" stroke-width="0.4" stroke-opacity="0.4"/>
+
+        <!-- GREEN: small patches -->
+        <g fill="#0a1f14" stroke="#1A5759" stroke-opacity="0.35" stroke-width="0.4">
+          <path d="M 240,80 L 360,82 L 360,120 L 240,120 Z"/>
+          <path d="M 420,60 L 520,60 L 520,100 L 420,100 Z"/>
+        </g>
+
+        <!-- SJÆLLANDSBROEN: diagonal arterial NE-SW, curves E across harbor -->
+        <path d="M 460,0 L 470,80 Q 478,140 506,180 Q 540,220 580,256 Q 640,300 720,330 L 820,360"
+              stroke="#1A5759" stroke-width="6" fill="none"/>
+        <path d="M 460,0 L 470,80 Q 478,140 506,180 Q 540,220 580,256 Q 640,300 720,330 L 820,360"
+              stroke="#35AEB3" stroke-width="0.4" fill="none" stroke-opacity="0.5" stroke-dasharray="1 4"/>
+
+        <!-- BÅDEHAVNSGADE: vertical street, metro down to destination -->
+        <path d="M 416,150 L 412,240 Q 410,290 400,330 L 388,420 L 382,490"
+              stroke="#1A5759" stroke-width="2.4" fill="none"/>
+
+        <!-- MOLESTIEN: short horizontal east of Bådehavnsgade -->
+        <path d="M 410,300 L 560,304"
+              stroke="#1A5759" stroke-width="1.2" fill="none" stroke-opacity="0.8"/>
+
+        <!-- Proshop U-turn junction at top -->
+        <path d="M 416,150 Q 440,130 460,130 Q 480,130 478,150"
+              stroke="#1A5759" stroke-width="1.6" fill="none"/>
+
+        <!-- Minor street grid (mainland residential, west) -->
+        <g stroke="#1A5759" stroke-width="0.7" fill="none" stroke-opacity="0.5">
+          <path d="M 0,90 L 430,95"/>
+          <path d="M 0,150 L 410,150"/>
+          <path d="M 0,200 L 410,205"/>
+          <path d="M 0,260 L 250,262"/>
+          <path d="M 80,0 L 86,220"/>
+          <path d="M 160,0 L 166,220"/>
+          <path d="M 240,0 L 248,220"/>
+          <path d="M 320,0 L 328,220"/>
+          <path d="M 100,340 L 108,410"/>
+          <path d="M 200,340 L 208,410"/>
+        </g>
+
+        <!-- Sluseholmen island street grid (top-right) -->
+        <g stroke="#1A5759" stroke-width="0.6" fill="none" stroke-opacity="0.4">
+          <path d="M 600,30 L 780,32"/>
+          <path d="M 600,80 L 780,82"/>
+          <path d="M 600,130 L 780,132"/>
+          <path d="M 600,180 L 780,182"/>
+          <path d="M 600,230 L 780,232"/>
+          <path d="M 620,0 L 622,260"/>
+          <path d="M 690,0 L 692,260"/>
+          <path d="M 760,0 L 762,260"/>
+        </g>
+
+        <!-- ROUTE TRAIL: Metro -> west briefly -> U-turn south -> down Bådehavnsgade -> destination -->
+        <path class="map-route-trail"
+              d="M 620,128 L 500,132 Q 470,132 462,148 Q 460,160 440,160 L 420,158 L 416,200 L 412,260 L 406,320 L 400,380 L 392,430 L 382,460"
+              stroke="#5DE0E6" stroke-width="2.2" stroke-dasharray="7 5" fill="none"/>
+
+        <!-- Route waypoint pips -->
+        <g fill="#5DE0E6" fill-opacity="0.65">
+          <circle cx="540" cy="130" r="1.8"/>
+          <circle cx="460" cy="150" r="1.8"/>
+          <circle cx="416" cy="220" r="1.8"/>
+          <circle cx="408" cy="300" r="1.8"/>
+          <circle cx="396" cy="400" r="1.8"/>
+        </g>
+
+        <!-- Distance tag on route -->
+        <g transform="translate(466, 300)">
+          <rect x="-32" y="-11" width="64" height="18" fill="#020a0a" stroke="#5DE0E6" stroke-width="0.8"/>
+          <text x="0" y="3" text-anchor="middle" font-size="10" font-family="Share Tech Mono, monospace" fill="#5DE0E6" style="letter-spacing:1.5px">8 MIN</text>
+          <polygon points="-6,7 0,14 6,7" fill="#020a0a" stroke="#5DE0E6" stroke-width="0.8"/>
+        </g>
+
+        <!-- Start marker: Sluseholmen Metro -->
+        <g transform="translate(620, 128)">
+          <circle r="6" fill="none" stroke="#5DE0E6" stroke-opacity="0.6">
+            <animate attributeName="r" from="6" to="22" dur="2s" repeatCount="indefinite"/>
+            <animate attributeName="stroke-opacity" from="0.7" to="0" dur="2s" repeatCount="indefinite"/>
+          </circle>
+          <circle r="5" fill="#5DE0E6"/>
+          <circle r="2" fill="#020a0a"/>
+          <text x="-12" y="-18" font-size="10" fill="#5DE0E6" font-family="Share Tech Mono, monospace" text-anchor="end" style="letter-spacing:1.5px">SLUSEHOLMEN_ST</text>
+          <text x="-12" y="-6" font-size="9" fill="#35AEB3" font-family="Share Tech Mono, monospace" text-anchor="end" style="letter-spacing:1px">ORIGIN // METRO</text>
+        </g>
+
+        <!-- End marker: destination crosshair -->
+        <g transform="translate(382, 460)">
+          <circle r="22" fill="none" stroke="#5DE0E6" stroke-opacity="0.25"/>
+          <circle r="14" fill="none" stroke="#5DE0E6" stroke-opacity="0.45"/>
+          <line x1="-16" y1="0" x2="-7" y2="0" stroke="#5DE0E6" stroke-width="1.2"/>
+          <line x1="7" y1="0" x2="16" y2="0" stroke="#5DE0E6" stroke-width="1.2"/>
+          <line x1="0" y1="-16" x2="0" y2="-7" stroke="#5DE0E6" stroke-width="1.2"/>
+          <line x1="0" y1="7" x2="0" y2="16" stroke="#5DE0E6" stroke-width="1.2"/>
+          <circle r="3" fill="#5DE0E6"/>
+          <text x="22" y="-6" font-size="10" fill="#5DE0E6" font-family="Share Tech Mono, monospace" style="letter-spacing:1.5px">TARGET</text>
+          <text x="22" y="8" font-size="9" fill="#35AEB3" font-family="Share Tech Mono, monospace" style="letter-spacing:1px">BÅDEHAVNSGADE_38</text>
+        </g>
+
+        <!-- Compass -->
+        <g transform="translate(60, 62)">
+          <circle r="22" fill="none" stroke="#1A5759"/>
+          <circle r="17" fill="none" stroke="#1A5759" stroke-opacity="0.5"/>
+          <line x1="0" y1="-22" x2="0" y2="-17" stroke="#35AEB3"/>
+          <line x1="0" y1="17" x2="0" y2="22" stroke="#35AEB3" stroke-opacity="0.4"/>
+          <line x1="-22" y1="0" x2="-17" y2="0" stroke="#35AEB3" stroke-opacity="0.4"/>
+          <line x1="17" y1="0" x2="22" y2="0" stroke="#35AEB3" stroke-opacity="0.4"/>
+          <polygon points="0,-14 -4,4 0,-2 4,4" fill="#5DE0E6"/>
+          <text x="0" y="-26" text-anchor="middle" font-size="10" fill="#5DE0E6" font-family="Share Tech Mono, monospace" style="letter-spacing:1.5px">N</text>
+        </g>
+
+        <!-- Scale bar -->
+        <g transform="translate(120, 472)">
+          <line x1="0" y1="0" x2="80" y2="0" stroke="#35AEB3" stroke-width="1.5"/>
+          <line x1="0" y1="-4" x2="0" y2="4" stroke="#35AEB3"/>
+          <line x1="40" y1="-3" x2="40" y2="3" stroke="#35AEB3"/>
+          <line x1="80" y1="-4" x2="80" y2="4" stroke="#35AEB3"/>
+          <text x="0" y="16" font-size="9" fill="#35AEB3" font-family="Share Tech Mono, monospace" style="letter-spacing:1px">0</text>
+          <text x="80" y="16" font-size="9" fill="#35AEB3" font-family="Share Tech Mono, monospace" text-anchor="middle" style="letter-spacing:1px">200M</text>
+        </g>
+
+        <!-- Coordinate readout -->
+        <text x="120" y="30" font-size="9" fill="#1A5759" font-family="Share Tech Mono, monospace" style="letter-spacing:1.5px">LAT 55.6471°N // LON 12.5402°E</text>
+
+        <!-- Water labels -->
+        <text x="580" y="450" font-size="10" fill="#35AEB3" fill-opacity="0.55" font-family="Share Tech Mono, monospace" style="letter-spacing:2px" font-style="italic">FISKERHAVNEN</text>
+        <text x="798" y="250" font-size="8" fill="#35AEB3" fill-opacity="0.5" font-family="Share Tech Mono, monospace" style="letter-spacing:1.5px" transform="rotate(-90 798 250)" font-style="italic">SYDHAVN</text>
+
+        <!-- Street labels -->
+        <text x="560" y="240" font-size="8" fill="#35AEB3" fill-opacity="0.7" font-family="Share Tech Mono, monospace" style="letter-spacing:1.5px" transform="rotate(38 560 240)">SJÆLLANDSBROEN</text>
+        <text x="396" y="380" font-size="8" fill="#35AEB3" fill-opacity="0.65" font-family="Share Tech Mono, monospace" style="letter-spacing:1.5px" transform="rotate(-88 396 380)">BÅDEHAVNSGADE</text>
+        <text x="470" y="298" font-size="7" fill="#35AEB3" fill-opacity="0.55" font-family="Share Tech Mono, monospace" style="letter-spacing:1px">MOLESTIEN</text>
+
+        <!-- Land / area labels -->
+        <text x="40" y="310" font-size="7" fill="#35AEB3" fill-opacity="0.5" font-family="Share Tech Mono, monospace" style="letter-spacing:2px">HAVEBYEN_MOZART</text>
+        <text x="150" y="60" font-size="8" fill="#35AEB3" fill-opacity="0.35" font-family="Share Tech Mono, monospace" style="letter-spacing:3px">SYDHAVN</text>
+        <text x="620" y="275" font-size="8" fill="#35AEB3" fill-opacity="0.45" font-family="Share Tech Mono, monospace" style="letter-spacing:2px">SLUSEHOLMEN</text>
+        <text x="60" y="380" font-size="7" fill="#35AEB3" fill-opacity="0.4" font-family="Share Tech Mono, monospace" style="letter-spacing:1.5px">PARK_STRIP</text>
+      </svg>
+    </div>
+  `},
   { text: '' },
   { text: '┌──────────────────────────────────────────┐', cls: 'separator' },
   { text: '│  END TRANSMISSION                        │', cls: 'separator' },
@@ -607,6 +883,18 @@ function typeNextChar() {
   }
 
   const line = lines[currentLine];
+
+  // Raw HTML injection (e.g. map, embedded graphics) — render once, no typing
+  if (line.type === 'html') {
+    const container = document.createElement('div');
+    container.innerHTML = line.html;
+    terminal.appendChild(container);
+    currentLine++;
+    currentChar = 0;
+    setTimeout(typeNextChar, 420);
+    return;
+  }
+
   const plainText = getPlainText(line);
 
   // Create line element if at start
