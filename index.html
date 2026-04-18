@@ -514,29 +514,9 @@ const lines = [
   ]},
   { text: '' },
   { text: 'WORKSHOP_AGENDA_OPTIONS:', cls: 'section-label' },
-  { text: '  [VISUAL_STYLE,', markup: [
+  { text: '  [VISUAL_STYLE_PLATFORM, KVALIFIK_LOGO_STATUS, ROADMAP, CORRELATION_ENGINE, ANCHOR_CUSTOMERS, VIDEOS, SECURITY, WEBSITE_VIDEOS, BLUESHADOW_OPPERATION_CENTER]', markup: [
     { text: '  [', cls: 'bracket' },
-    { text: 'VISUAL_STYLE,', cls: 'val' }
-  ]},
-  { text: '   KVALIFIK_LOGO_STATUS,', markup: [
-    { text: '   ', cls: '' },
-    { text: 'KVALIFIK_LOGO_STATUS,', cls: 'val' }
-  ]},
-  { text: '   ROADMAP,', markup: [
-    { text: '   ', cls: '' },
-    { text: 'ROADMAP,', cls: 'val' }
-  ]},
-  { text: '   CORRELATION_ENGINE,', markup: [
-    { text: '   ', cls: '' },
-    { text: 'CORRELATION_ENGINE,', cls: 'val' }
-  ]},
-  { text: '   ANCHOR_CUSTOMERS,', markup: [
-    { text: '   ', cls: '' },
-    { text: 'ANCHOR_CUSTOMERS,', cls: 'val' }
-  ]},
-  { text: '   VIDEOS]', markup: [
-    { text: '   ', cls: '' },
-    { text: 'VIDEOS', cls: 'val' },
+    { text: 'VISUAL_STYLE_PLATFORM, KVALIFIK_LOGO_STATUS, ROADMAP, CORRELATION_ENGINE, ANCHOR_CUSTOMERS, VIDEOS, SECURITY, WEBSITE_VIDEOS, BLUESHADOW_OPPERATION_CENTER', cls: 'val' },
     { text: ']', cls: 'bracket' }
   ]},
   { text: '' },
@@ -640,7 +620,7 @@ function typeNextChar() {
       lineEl.innerHTML = '&nbsp;';
       currentLine++;
       currentChar = 0;
-      setTimeout(typeNextChar, 40);
+      setTimeout(typeNextChar, 160); // breathe on blank lines
       return;
     }
   }
@@ -673,14 +653,33 @@ function typeNextChar() {
     lineEl.appendChild(createCursor());
 
     currentChar++;
-    const delay = plainText[currentChar - 1] === ' ' ? 15 : (Math.random() * 25 + 12);
+    const justTyped = plainText[currentChar - 1];
+
+    // Base char cadence — unchanged authentic CRT feel
+    let delay;
+    if (justTyped === ' ') delay = 18;
+    else delay = Math.random() * 25 + 12;
+
+    // Punctuation micro-holds — operator weighing what comes next
+    if (justTyped === ',') delay += 140;
+    else if (justTyped === ':') delay += 180;
+    else if (justTyped === ']') delay += 220;
+    else if (justTyped === '?') delay += 160;
+    else if (justTyped === '.') delay += 120;
+
     setTimeout(typeNextChar, delay);
   } else {
-    // Line complete
+    // Line complete — inter-line beat varies by line type
     if (cursorEl) cursorEl.remove();
+
+    let interLineDelay = 180;
+    if (line.cls === 'section-label') interLineDelay = 400;   // dramatic beat after header
+    else if (line.cls === 'separator') interLineDelay = 280;  // settle after divider
+    else if (line.cls === 'highlight') interLineDelay = 340;  // let callout land
+
     currentLine++;
     currentChar = 0;
-    setTimeout(typeNextChar, 80);
+    setTimeout(typeNextChar, interLineDelay);
   }
 }
 
